@@ -16,5 +16,20 @@ namespace ST_Serial
         {
             InitializeComponent();
         }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            windows.settings NewSettingWindow = new windows.settings();
+
+            if (NewSettingWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                
+            }
+
+            else
+            {
+                
+            }
+        }
     }
 }
