@@ -31,5 +31,32 @@ namespace ST_Serial
                 
             }
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            code.serialport.SerialPort_Close();
+
+            this.Close();
+        }
+
+        private void mainwindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            code.serialport.SerialPort_Close();
+        }
+
+        private void stm32f103c8t6ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            windows.Flash NewFlashWindow = new windows.Flash("stm32f103c8t6");
+
+            if (NewFlashWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+
+            }
+
+            else
+            {
+
+            }
+        }
     }
 }

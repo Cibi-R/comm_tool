@@ -34,6 +34,11 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.flashMCUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.consoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.texterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stm32f103c8t6ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +54,8 @@
             // 
             this.menuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.menuToolStripMenuItem});
             this.menuStrip2.Location = new System.Drawing.Point(0, 0);
             this.menuStrip2.Name = "menuStrip2";
             this.menuStrip2.Size = new System.Drawing.Size(840, 24);
@@ -69,6 +75,7 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -76,6 +83,43 @@
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // menuToolStripMenuItem
+            // 
+            this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.flashMCUToolStripMenuItem,
+            this.consoleToolStripMenuItem,
+            this.texterToolStripMenuItem});
+            this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.menuToolStripMenuItem.Text = "Menu";
+            // 
+            // flashMCUToolStripMenuItem
+            // 
+            this.flashMCUToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.stm32f103c8t6ToolStripMenuItem});
+            this.flashMCUToolStripMenuItem.Name = "flashMCUToolStripMenuItem";
+            this.flashMCUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.flashMCUToolStripMenuItem.Text = "Flash MCU";
+            // 
+            // consoleToolStripMenuItem
+            // 
+            this.consoleToolStripMenuItem.Name = "consoleToolStripMenuItem";
+            this.consoleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.consoleToolStripMenuItem.Text = "Terminal";
+            // 
+            // texterToolStripMenuItem
+            // 
+            this.texterToolStripMenuItem.Name = "texterToolStripMenuItem";
+            this.texterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.texterToolStripMenuItem.Text = "Texter";
+            // 
+            // stm32f103c8t6ToolStripMenuItem
+            // 
+            this.stm32f103c8t6ToolStripMenuItem.Name = "stm32f103c8t6ToolStripMenuItem";
+            this.stm32f103c8t6ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stm32f103c8t6ToolStripMenuItem.Text = "stm32f103c8t6";
+            this.stm32f103c8t6ToolStripMenuItem.Click += new System.EventHandler(this.stm32f103c8t6ToolStripMenuItem_Click);
             // 
             // mainwindow
             // 
@@ -90,6 +134,7 @@
             this.Name = "mainwindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ST Serial";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.mainwindow_FormClosing);
             this.menuStrip2.ResumeLayout(false);
             this.menuStrip2.PerformLayout();
             this.ResumeLayout(false);
@@ -104,5 +149,10 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem flashMCUToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem consoleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem texterToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stm32f103c8t6ToolStripMenuItem;
     }
 }
