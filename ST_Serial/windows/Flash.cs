@@ -12,12 +12,42 @@ namespace ST_Serial.windows
 {
     public partial class Flash : Form
     {
-        public Flash(string ButtonName)
+        public Flash()
         {
-            /* The buttonName will have the name of the button which caused this window open */
-            this.Name = "Flash - " + ButtonName;
-
             InitializeComponent();
+
+            Init_FlashWindow_UI();
+        }
+
+        private void Init_FlashWindow_UI()
+        {
+            label1.Text = "";
+
+            /* openFile dialogue initialization:
+             * 
+             * Set Defualt Extension(DefaultExt) to hex
+             */
+            openFileDialog1.DefaultExt = "hex";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            /* Browse button */
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBox1.Text = openFileDialog1.SafeFileName;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            /* Write button */
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            /* Cancel button */
+            this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         }
     }
 }

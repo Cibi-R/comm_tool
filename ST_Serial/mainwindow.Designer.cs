@@ -38,7 +38,6 @@
             this.flashMCUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.consoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.texterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stm32f103c8t6ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,7 +72,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -96,30 +95,24 @@
             // 
             // flashMCUToolStripMenuItem
             // 
-            this.flashMCUToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.stm32f103c8t6ToolStripMenuItem});
             this.flashMCUToolStripMenuItem.Name = "flashMCUToolStripMenuItem";
             this.flashMCUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.flashMCUToolStripMenuItem.Text = "Flash MCU";
+            this.flashMCUToolStripMenuItem.Click += new System.EventHandler(this.flashMCUToolStripMenuItem_Click);
             // 
             // consoleToolStripMenuItem
             // 
             this.consoleToolStripMenuItem.Name = "consoleToolStripMenuItem";
             this.consoleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.consoleToolStripMenuItem.Text = "Terminal";
+            this.consoleToolStripMenuItem.Text = "Console";
+            this.consoleToolStripMenuItem.Click += new System.EventHandler(this.consoleToolStripMenuItem_Click);
             // 
             // texterToolStripMenuItem
             // 
             this.texterToolStripMenuItem.Name = "texterToolStripMenuItem";
             this.texterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.texterToolStripMenuItem.Text = "Texter";
-            // 
-            // stm32f103c8t6ToolStripMenuItem
-            // 
-            this.stm32f103c8t6ToolStripMenuItem.Name = "stm32f103c8t6ToolStripMenuItem";
-            this.stm32f103c8t6ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.stm32f103c8t6ToolStripMenuItem.Text = "stm32f103c8t6";
-            this.stm32f103c8t6ToolStripMenuItem.Click += new System.EventHandler(this.stm32f103c8t6ToolStripMenuItem_Click);
+            this.texterToolStripMenuItem.Click += new System.EventHandler(this.texterToolStripMenuItem_Click);
             // 
             // mainwindow
             // 
@@ -153,6 +146,5 @@
         private System.Windows.Forms.ToolStripMenuItem flashMCUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem consoleToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem texterToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem stm32f103c8t6ToolStripMenuItem;
     }
 }

@@ -21,14 +21,21 @@ namespace ST_Serial
         {
             windows.settings NewSettingWindow = new windows.settings();
 
-            if (NewSettingWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            var DialogResult = NewSettingWindow.ShowDialog();
+
+            if (DialogResult == System.Windows.Forms.DialogResult.OK)
             {
                 
             }
 
+            else if (DialogResult == System.Windows.Forms.DialogResult.Retry)
+            {
+                MessageBox.Show("Unsupported values configured for ports", "Something went wrong!",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+
             else
             {
-                
+                /* User pressed cancel button. */
             }
         }
 
@@ -44,9 +51,9 @@ namespace ST_Serial
             code.serialport.SerialPort_Close();
         }
 
-        private void stm32f103c8t6ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void flashMCUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            windows.Flash NewFlashWindow = new windows.Flash("stm32f103c8t6");
+            windows.Flash NewFlashWindow = new windows.Flash();
 
             if (NewFlashWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -55,7 +62,37 @@ namespace ST_Serial
 
             else
             {
+                /* To be implemented. */
+            }
+        }
 
+        private void consoleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            windows.console NewTerminalWindow = new windows.console();
+
+            if (NewTerminalWindow.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+
+            }
+
+            else
+            {
+                /* To be implemented. */
+            }
+        }
+
+        private void texterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            windows.texter NewTexter = new windows.texter();
+
+            if (NewTexter.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+
+            }
+
+            else
+            {
+                /* To be implemented. */
             }
         }
     }
