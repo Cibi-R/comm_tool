@@ -13,6 +13,7 @@ namespace ST_Serial.usercontrol
     public partial class uc_texter : UserControl
     {
         int KeyCount = -1;
+        bool PlaceHifen = false;
         public uc_texter(string GroupboxNo)
         {
             InitializeComponent();
@@ -28,6 +29,9 @@ namespace ST_Serial.usercontrol
 
             /* Append the Groupbox number to groupbox name. */
             groupBox1.Text += GroupboxNo;
+
+            /* Set the label text to null (used to indicate the staus of the sent data)*/
+            label1.Text = "";
         }
 
         private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
@@ -47,19 +51,34 @@ namespace ST_Serial.usercontrol
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click_1(object sender, EventArgs e)
         {
             /* send/start button */
 
             if ((!checkBox1.Checked) && (button1.Text == "send"))
             {
-                MessageBox.Show("Data sent!");
+                List<byte> ConvertedData = new List<byte>();
+
+                ConvertedData = code.lib.ConvertStringAToByteA(richTextBox1.Text.Split('-'));
+
+                /* Send data serially */
+                if (code.serialport.SerialPort_WriteByteArray(ConvertedData.ToArray()))
+                {
+                    label1.Text = "sent";
+                    label1.BackColor = System.Drawing.Color.Green;
+                }
+
+                else
+                {
+                    label1.Text = "failed";
+                    label1.BackColor = System.Drawing.Color.Red;
+                }
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click_1(object sender, EventArgs e)
         {
-            /* set time button */
+            /* To be implemented. */
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -73,11 +92,16 @@ namespace ST_Serial.usercontrol
 
             else
             {
+                /* Behaviour of textbox while pressing backspace to be implemented. */
                 if (PressedChar == '\b')
                 {
-                    if ((richTextBox1.Text != null) && (KeyCount != -1))
+                    if (richTextBox1.Text != null)
                     {
-                        //KeyCount
+                        
+                    }
+                    else
+                    {
+
                     }
                 }
 
@@ -85,14 +109,21 @@ namespace ST_Serial.usercontrol
                 {
                     KeyCount++;
 
-                    if (KeyCount == 2)
+                    if (PlaceHifen)
                     {
-                        KeyCount = 0;
+                        PlaceHifen = false;
+
                         richTextBox1.Text += "-";
 
                         /* Placing the cursor at the last position. */
                         richTextBox1.Focus();
                         richTextBox1.SelectionStart = richTextBox1.Text.Length;
+                    }
+
+                    if (KeyCount == 1)
+                    {
+                        KeyCount = -1;
+                        PlaceHifen = true;
                     }
                 }
             }

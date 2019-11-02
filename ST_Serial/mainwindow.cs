@@ -95,5 +95,30 @@ namespace ST_Serial
                 /* To be implemented. */
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (button1.Text == "open")
+            {
+                if (code.serialport.SerialPort_IsConfigured())
+                {
+                    code.serialport.SerialPort_Open();
+
+                    button1.Text = "close";
+                }
+
+                else
+                {
+                    MessageBox.Show("Serial port is not configured!","Nofification", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+
+            else
+            {
+                code.serialport.SerialPort_Close();
+
+                button1.Text = "open";
+            }
+        }
     }
 }

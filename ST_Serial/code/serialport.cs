@@ -63,45 +63,62 @@ namespace ST_Serial.code
         public static bool SerialPort_WriteString(string Data)
         {
             bool IsDataSent = true;
-            try
+
+            if (IsPortOpen())
             {
-                MySerialPort.Write(Data);
+                try
+                {
+                    MySerialPort.Write(Data);
+                }
+                catch
+                {
+                    IsDataSent = false;
+                }
             }
-            catch
-            {
-                IsDataSent = false;
-            }
+            else { IsDataSent = false; }
             return IsDataSent;
         }
 
         public static bool SerialPort_WriteByteArray(byte[] Data)
         {
             bool IsDataSent = true;
-            try
+
+            if (IsPortOpen())
             {
-                MySerialPort.Write(Data, 0, Data.Length);
-            }
-            catch
-            {
-                IsDataSent = false;
-            }
+                try
+                {
+                    MySerialPort.Write(Data, 0, Data.Length);
+                }
+                catch
+                {
+                    IsDataSent = false;
+                }
+            } else { IsDataSent = false; }
+
             return IsDataSent;
         }
 
         public static byte[] SerialPort_ReadByte()
         {
-            try
+            if (IsPortOpen())
             {
-                int ByteCount = MySerialPort.BytesToRead;
+                try
+                {
+                    int ByteCount = MySerialPort.BytesToRead;
 
-                byte[] ReceivedBytes = new byte[ByteCount];
+                    byte[] ReceivedBytes = new byte[ByteCount];
 
-                MySerialPort.Read(ReceivedBytes, 0, ByteCount);
+                    MySerialPort.Read(ReceivedBytes, 0, ByteCount);
 
-                return ReceivedBytes;
+                    return ReceivedBytes;
+                }
+
+                catch
+                {
+                    return null;
+                }
             }
-
-            catch
+            else
             {
                 return null;
             }
@@ -111,15 +128,19 @@ namespace ST_Serial.code
         {
             string ReceivedString = null;
 
-            try
+            if (IsPortOpen())
             {
-                ReceivedString = MySerialPort.ReadExisting();
+                try
+                {
+                    ReceivedString = MySerialPort.ReadExisting();
+                }
+
+                catch
+                {
+                    /* Do nothing */
+                }
             }
 
-            catch
-            {
-                /* Do nothing */
-            }
             return ReceivedString;
         }
 
