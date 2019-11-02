@@ -24,15 +24,27 @@ namespace ST_Serial.windows
         {
             SerialPort TempPort = Get_Configured_Values();
 
-            if (TempPort != null)
+            /* Serial cannot be configured while the port is in open condition. */
+            if (code.serialport.IsPortOpen())
+            {
+                MessageBox.Show("Close the port before proceed to configure","Configuration info",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
+
+            else if (TempPort != null)
             {
                 code.serialport.SerialPort_Configure(TempPort);
+
+                Store_Configured_Values();
+
+                Properties.Settings.Default.IsConfigured = true;
 
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
             }
 
             else
             {
+                Properties.Settings.Default.IsConfigured = false;
+
                 this.DialogResult = System.Windows.Forms.DialogResult.Retry;
             }
         }
@@ -57,10 +69,18 @@ namespace ST_Serial.windows
             comboBox4.Items.AddRange(new string[] { "None","Even", "Odd","Mark","Space" });
 
 
-            /* Initial values for the combo box. */
-            comboBox2.SelectedIndex = 1;
-            comboBox3.SelectedIndex = 0;
-            comboBox4.SelectedIndex = 0;
+            if (Properties.Settings.Default.IsConfigured)
+            {
+                Retrieve_Configured_Values();
+            }
+
+            else
+            {
+                /* Initial values for the combo box if not configured. */
+                comboBox2.SelectedIndex = 1;
+                comboBox3.SelectedIndex = 0;
+                comboBox4.SelectedIndex = 0;
+            }
         }
 
         private string[] Get_Available_Ports()
@@ -86,6 +106,32 @@ namespace ST_Serial.windows
             }
 
             return TempPort;
+        }
+
+        private void Store_Configured_Values()
+        {
+            Properties.Settings.Default.Port = comboBox1.Text;
+            Properties.Settings.Default.Baud_Rate = comboBox2.Text;
+            Properties.Settings.Default.Stop_Bit = comboBox3.Text;
+            Properties.Settings.Default.Parity_Bit = comboBox4.Text;
+        }
+
+        private void Retrieve_Configured_Values()
+        {
+            /* Port */
+            if (Get_Available_Ports().Any(Properties.Settings.Default.Port.Contains))
+            {
+                comboBox1.SelectedIndex = comboBox1.Items.IndexOf(Properties.Settings.Default.Port);
+            }else { /* Do nothing */ }
+
+            /* Baud Rate */
+            comboBox2.SelectedIndex = comboBox2.Items.IndexOf(Properties.Settings.Default.Baud_Rate);
+
+            /* Stop Bit */
+            comboBox3.SelectedIndex = comboBox3.Items.IndexOf(Properties.Settings.Default.Stop_Bit);
+
+            /* Parity Bit */
+            comboBox4.SelectedIndex = comboBox4.Items.IndexOf(Properties.Settings.Default.Parity_Bit);
         }
     }
 }
