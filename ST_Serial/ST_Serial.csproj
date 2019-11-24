@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="code\files.cs" />
     <Compile Include="code\lib.cs" />
     <Compile Include="code\serialport.cs" />
     <Compile Include="mainwindow.cs">
