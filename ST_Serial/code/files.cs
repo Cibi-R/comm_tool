@@ -12,39 +12,86 @@ namespace ST_Serial.code
     {
         public static void Parse_HexStream(FileStream NewStream)
         {
+            List<byte> SingleRecord = new List<byte>();
+
             BinaryReader NewBReader = new BinaryReader(NewStream);
 
-            bool RecordStart = false;
+            bool RecordStart = false, EndReading = false;
             string Byte = null;
             int RawValue;
-            byte HexValue;
 
-            while ((RawValue = NewBReader.ReadChar()) != -1)
+            /*************************   Code Coupled with Serialport class  *****************************/
+
+            if (code.serialport.CurrentSerialAPP == (int)Application.APP_NONE)
             {
-                if ((char)RawValue == ':')
-                {
-                    RecordStart = true;
-                }
+                code.serialport.CurrentSerialAPP = (int)Application.APP_FLASH;
+            }
 
-                else if (((char)RawValue == '\r') || ((char)RawValue == '\n'))
-                {
-                    RecordStart = false;
-                }
+            else
+            {
+                MessageBox.Show("Cannot use Serial port righ now!,[" + code.serialport.CurrentSerialAPP.ToString() +
+                    "] using the serial port", "Serial Port Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                else if (RecordStart)
-                {
-                    Byte += ((char)RawValue).ToString();
+                /* Return incase if other applications using the serial port */
+                return;
+            }
 
-                    if (Byte.Length == 2)
+            /*********************************************************************************************/
+
+            try
+            {
+                while (((RawValue = NewBReader.ReadChar()) != -1) && !EndReading)
+                {
+                    if ((char)RawValue == ':')
                     {
-                        MessageBox.Show(Byte);
+                        RecordStart = true;
+                    }
 
-                        HexValue = code.lib.ConvertStringToByte(Byte);
+                    else if (((char)RawValue == '\r') || ((char)RawValue == '\n'))
+                    {
+                        if (RecordStart)
+                        {
+                            if (!code.serialport.SerialPort_WriteByteArray(SingleRecord.ToArray()))
+                            {
+                                MessageBox.Show("Something went wrong while streaming bytes!\nCheck Serial port", "Port Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                        Byte = null;
+                                /* End reading incase of error */
+                                EndReading = true;
+                            }
+                        }
+
+                        RecordStart = false;
+                    }
+
+                    else if (RecordStart)
+                    {
+                        Byte += ((char)RawValue).ToString();
+
+                        if (Byte.Length == 2)
+                        {
+                            SingleRecord.Add(code.lib.ConvertStringToByte(Byte));
+
+                            Byte = null;
+                        }
+                    }
+
+                    else
+                    {
+                        MessageBox.Show("Logical error!");
+
+                        /* End reading incase of error */
+                        EndReading = true;
                     }
                 }
             }
+
+            catch
+            {
+                MessageBox.Show("Something went wrong while parsing Hex!","Parse Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+
+            /* Reset current application using the serail port. */
+            code.serialport.CurrentSerialAPP = (int)Application.APP_NONE;
         }
     }
 }

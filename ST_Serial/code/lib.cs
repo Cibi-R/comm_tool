@@ -27,21 +27,24 @@ namespace ST_Serial.code
         {
             byte ConvertedData = 0x00;
 
-            for (int i=0; i<2; i++)
+            if (Data.Length == 2)
             {
-                if ((Data[i] >= 'A') && (Data[i] <= 'F'))
+                for (int i = 0; i < 2; i++)
                 {
-                    ConvertedData |= (byte)((Data[i] - 0x37) << (i * 4));
-                }
+                    if ((Data[i] >= 'A') && (Data[i] <= 'F'))
+                    {
+                        ConvertedData |= (byte)((Data[i] - 0x37) << (i * 4));
+                    }
 
-                else if ((Data[i] >= '0') && (Data[i] <= '9'))
-                {
-                    ConvertedData |= (byte)((Data[i] - 0x30) << (i * 4));
-                }
+                    else if ((Data[i] >= '0') && (Data[i] <= '9'))
+                    {
+                        ConvertedData |= (byte)((Data[i] - 0x30) << (i * 4));
+                    }
 
-                else
-                {
-                    ConvertedData |= (byte)(0 << (i * 4));
+                    else
+                    {
+                        ConvertedData |= (byte)(0 << (i * 4));
+                    }
                 }
             }
 

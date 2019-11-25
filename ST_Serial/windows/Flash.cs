@@ -37,16 +37,30 @@ namespace ST_Serial.windows
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 textBox1.Text = openFileDialog1.SafeFileName;
-
-                FileStream NewStream = new FileStream(openFileDialog1.FileName, FileMode.Open);
-
-                code.files.Parse_HexStream(NewStream);
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             /* Write button */
+            if (openFileDialog1.FileName != "")
+            {
+                try
+                {
+                    FileStream NewStream = new FileStream(openFileDialog1.FileName, FileMode.Open);
+                    code.files.Parse_HexStream(NewStream);
+                    NewStream.Dispose();
+                }
+                catch
+                {
+                    MessageBox.Show("Something went wrong while accessing file\nInvalid path or file","File Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                }
+            }
+
+            else
+            {
+                MessageBox.Show("File not selected!", "Flash Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)

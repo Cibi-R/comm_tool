@@ -7,12 +7,25 @@ using System.Threading.Tasks;
 
 namespace ST_Serial.code
 {
+    public enum Application
+    {
+        /**********************************************************************************************************
+                Application specific enum values to gaurd the serial port from multiple application
+        ***********************************************************************************************************/
+        APP_NONE,
+        APP_CONSOLE,
+        APP_FLASH,
+        APP_TEXTER,
+        APP_UNKNOWN,
+        APP_MAX,
+    };
     class serialport
     {
+        public static int CurrentSerialAPP = (int)Application.APP_NONE;
+
         private static SerialPort MySerialPort = new SerialPort();
 
         private static bool IsSerialPortConfigured = false;
-
         public static void SerialPort_Configure(SerialPort PortData)
         {
             MySerialPort.PortName = PortData.PortName;
