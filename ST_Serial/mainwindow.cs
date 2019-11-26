@@ -15,6 +15,10 @@ namespace ST_Serial
         public mainwindow()
         {
             InitializeComponent();
+
+            windows.console.Console_Log_Info("TempValues");
+            windows.console.Console_Log_Warning("TempValues");
+            windows.console.Console_Log_Error("TempValues");
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
