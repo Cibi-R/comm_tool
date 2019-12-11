@@ -49,36 +49,82 @@ namespace ST_Serial.usercontrol
                 button2.Enabled = false;
                 button2.Visible = false;
             }
+
+            /* Stop the timer on both cases. */
+            timer1.Stop();
         }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
             /* send/start button */
-
-            if ((!checkBox1.Checked) && (button1.Text == "send"))
+            if (!(code.serialport.IsPortOpen() && code.serialport.SerialPort_IsConfigured()))
             {
-                List<byte> ConvertedData = new List<byte>();
+                MessageBox.Show("Port not cofigured or opened!", "Texting Information",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
-                ConvertedData = code.lib.ConvertStringAToByteA(richTextBox1.Text.Split('-'));
+            else if ((!checkBox1.Checked) && (button1.Text == "send"))
+            {
+                Text_Data(richTextBox1.Text);
+            }
 
-                /* Send data serially */
-                if (code.serialport.SerialPort_WriteByteArray(ConvertedData.ToArray()))
+            else if (checkBox1.Checked)
+            {
+                if (button1.Text == "start")
                 {
-                    label1.Text = "sent";
-                    label1.BackColor = System.Drawing.Color.Green;
+                    if (timer1.Interval > 0)
+                    {
+                        timer1.Start();
+
+                        button1.Text = "stop";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Interval has not been set","Texting Information",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
 
-                else
+                else if (button1.Text == "stop")
                 {
-                    label1.Text = "failed";
-                    label1.BackColor = System.Drawing.Color.Red;
+                    if (timer1.Interval > 0)
+                    {
+                        timer1.Stop();
+
+                        button1.Text = "start";
+                    }
                 }
+            }
+
+            else
+            {
+                /* Do Nothing */
             }
         }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            /* To be implemented. */
+            /* SetTime button */
+            
+            if(button1.Text == "start")
+            {
+                windows.timing NewTimingWindow = new windows.timing(timer1.Interval);
+
+                if (NewTimingWindow.ShowDialog() == DialogResult.OK)
+                {
+                    timer1.Interval = NewTimingWindow.Timer_Interval;
+                }
+                else
+                {
+                    MessageBox.Show("Previous value retained for timer!", "Texting Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("stop the ongoing communication","Texting Information",
+                    MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -127,6 +173,36 @@ namespace ST_Serial.usercontrol
                     }
                 }
             }
+        }
+
+        private void Text_Data(string StringData)
+        {
+            List<byte> ConvertedData = new List<byte>();
+
+            ConvertedData = code.lib.ConvertStringAToByteA(StringData.Split('-'));
+
+            if (ConvertedData.Count == 0)
+            {
+                label1.Text = "Value Empty";
+                label1.ForeColor = System.Drawing.Color.Blue;
+            }
+            /* Send data serially */
+            else if (code.serialport.SerialPort_WriteByteArray(ConvertedData.ToArray()))
+            {
+                label1.Text = "sent";
+                label1.ForeColor = System.Drawing.Color.Green;
+            }
+
+            else
+            {
+                label1.Text = "failed";
+                label1.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Text_Data(richTextBox1.Text);
         }
     }
 }

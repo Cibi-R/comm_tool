@@ -10,37 +10,39 @@ using System.Windows.Forms;
 
 namespace ST_Serial.windows
 {
-    enum Log
-    {
-        INFO,
-        WARNING,
-        ERROR,
-        NONE,
-        MAX
-    }
-
-    class LogValue
-    {
-        public int Value;
-        public string Data;
-
-        public LogValue(int Val = 0, string Dat = "None")
-        {
-            Value = Val;
-            Data = Dat;
-        }
-    };
-
     public partial class console : Form
     {
-        private static Queue<LogValue> ConsoleData = new Queue<LogValue>();
-
         public console()
         {
             InitializeComponent();
 
-            code.serialport.SerialPort_Open();
+            Console_Log_Load();
         }
+
+        enum Log
+        {
+            INFO,
+            WARNING,
+            ERROR,
+            NONE,
+            MAX
+        }
+
+        class LogValue
+        {
+            public int Value;
+            public string Data;
+
+            public LogValue(int Val = 0, string Dat = "None")
+            {
+                Value = Val;
+                Data = Dat;
+            }
+        }
+
+        private static Queue<LogValue> ConsoleData = new Queue<LogValue>();
+
+        private static Queue<LogValue> ConsoleData_Mirror = new Queue<LogValue>();
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -59,9 +61,14 @@ namespace ST_Serial.windows
         {
             while (ConsoleData.Count > 0)
             {
+                /* Enqueue the console_data to display it console. */
                 LogValue Data = ConsoleData.Dequeue();
+
                 richTextBox1.SelectionColor = GetColor(Data.Value);
-                richTextBox1.SelectedText += Environment.NewLine;
+                richTextBox1.SelectedText += Data.Data + Environment.NewLine;
+
+                /* Store the enqueued data on Consoledata_mirror for backup during re instantiating of this window. */
+                ConsoleData_Mirror.Enqueue(Data);
             }
         }
 
@@ -95,11 +102,11 @@ namespace ST_Serial.windows
 
         private static string GetCurrentTimeDate()
         {
-            return "[" + DateTime.UtcNow.Date.ToString("dd/MM/yyyy") + "] - " + "[" + DateTime.UtcNow.Date.ToString("dd/MM/yyyy") + "] - ";
+            return "[" + DateTime.UtcNow.Date.ToString("dd/MM/yyyy") + "] - " + "[" + DateTime.Now.ToString("h:mm:ss tt") + "] - ";
         }
         public static void Console_Log_Info(string ConsoleString)
         {
-            ConsoleData.Enqueue(new LogValue((int)Log.INFO, GetCurrentTimeDate() + "[INFO] - "+ ConsoleString));
+            ConsoleData.Enqueue(new LogValue((int)Log.INFO, GetCurrentTimeDate() + "[INFO] - " + ConsoleString));
         }
 
         public static void Console_Log_Warning(string ConsoleString)
@@ -111,5 +118,14 @@ namespace ST_Serial.windows
         {
             ConsoleData.Enqueue(new LogValue((int)Log.ERROR, GetCurrentTimeDate() + "[ERROR] - " + ConsoleString));
         }
+
+        private static void Console_Log_Load()
+        {
+            while (ConsoleData_Mirror.Count > 0)
+            {
+                ConsoleData.Enqueue(ConsoleData_Mirror.Dequeue());
+            }
+        }
     }
 }
+

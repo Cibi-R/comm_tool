@@ -10,7 +10,7 @@ namespace ST_Serial.code
     public enum Application
     {
         /**********************************************************************************************************
-                Application specific enum values to gaurd the serial port from multiple application
+                Application specific enum values to gaurd the serial port from multiple application accessing it.
         ***********************************************************************************************************/
         APP_NONE,
         APP_CONSOLE,
@@ -40,13 +40,17 @@ namespace ST_Serial.code
         {
             bool PortOpened = true;
 
-            try
+            if (!IsPortOpen())
             {
-                MySerialPort.Open();
-            }
-            catch
-            {
-                PortOpened = false;
+                try
+                {
+                    MySerialPort.Open();
+                }
+                catch
+                {
+                    PortOpened = false;
+                }
+
             }
 
             return PortOpened;
@@ -56,13 +60,16 @@ namespace ST_Serial.code
         {
             bool PortClosed = true;
 
-            try
+            if (IsPortOpen())
             {
-                MySerialPort.Close();
-            }
-            catch
-            {
-                PortClosed = false;
+                try
+                {
+                    MySerialPort.Close();
+                }
+                catch
+                {
+                    PortClosed = false;
+                }
             }
 
             return PortClosed;
