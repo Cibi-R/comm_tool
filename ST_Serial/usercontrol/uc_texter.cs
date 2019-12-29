@@ -14,6 +14,7 @@ namespace ST_Serial.usercontrol
     {
         int KeyCount = -1;
         bool PlaceHifen = false;
+        bool BreakTimer = false;
         public uc_texter(string GroupboxNo)
         {
             InitializeComponent();
@@ -141,14 +142,7 @@ namespace ST_Serial.usercontrol
                 /* Behaviour of textbox while pressing backspace to be implemented. */
                 if (PressedChar == '\b')
                 {
-                    if (richTextBox1.Text != null)
-                    {
-                        
-                    }
-                    else
-                    {
 
-                    }
                 }
 
                 else
@@ -202,7 +196,49 @@ namespace ST_Serial.usercontrol
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Text_Data(richTextBox1.Text);
+                                                         // APP.NONE
+            while ((!(code.serialport.CurrentSerialAPP == (int)0)) && (!BreakTimer))
+            {
+                if (!timer2.Enabled)
+                {
+                    timer2.Enabled = true;
+                    timer2.Start();
+                }
+                else { /* Do Nothing */ }
+
+                if (timer1.Enabled)
+                {
+                    timer1.Stop();
+                    timer1.Enabled = false;
+                }
+                else { /* Do Nothing */ }
+            }
+
+            timer1.Enabled = true;
+            timer1.Start();
+
+            timer2.Stop();
+            timer2.Enabled = false;
+
+            if (!BreakTimer)
+            {
+                /* Set the serial port resource to texter  */
+                code.serialport.CurrentSerialAPP = (int)3;
+
+                Text_Data(richTextBox1.Text);
+
+                /* release the serial port resource from texter */
+                code.serialport.CurrentSerialAPP = (int)0;
+            }
+            else
+            {
+                BreakTimer = false;
+            }
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            BreakTimer = true;
         }
     }
 }

@@ -130,6 +130,8 @@ namespace ST_Serial.code
 
                     MySerialPort.Read(ReceivedBytes, 0, ByteCount);
 
+                    MySerialPort.DiscardInBuffer();
+
                     return ReceivedBytes;
                 }
 

@@ -25,7 +25,7 @@ namespace ST_Serial.code
 
         public static byte ConvertStringToByte(string Data)
         {
-            byte ConvertedData = 0x00;
+            Int32 ConvertedData = 0x00;
 
             if (Data.Length == 2)
             {
@@ -33,22 +33,24 @@ namespace ST_Serial.code
                 {
                     if ((Data[i] >= 'A') && (Data[i] <= 'F'))
                     {
-                        ConvertedData |= (byte)((Data[i] - 0x37) << (i * 4));
+                        ConvertedData |= (Int32)((Data[i] - 0x37) << (i * 4));
                     }
 
                     else if ((Data[i] >= '0') && (Data[i] <= '9'))
                     {
-                        ConvertedData |= (byte)((Data[i] - 0x30) << (i * 4));
+                        ConvertedData |= (Int32)((Data[i] - 0x30) << (i * 4));
                     }
 
                     else
                     {
-                        ConvertedData |= (byte)(0 << (i * 4));
+                        ConvertedData |= (Int32)(0 << (i * 4));
                     }
                 }
+
+                ConvertedData = (ConvertedData >> 4) | (ConvertedData << 4);
             }
 
-            return ConvertedData;
+            return (byte)(ConvertedData & (0xFF));
         }
     }
 }

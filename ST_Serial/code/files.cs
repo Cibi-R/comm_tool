@@ -12,12 +12,15 @@ namespace ST_Serial.code
     {
         public static void Parse_HexStream(FileStream NewStream)
         {
+            /* To store a single record while sending records to the MCU */
             List<byte> SingleRecord = new List<byte>();
 
             BinaryReader NewBReader = new BinaryReader(NewStream);
 
             bool RecordStart = false, EndReading = false;
+
             string Byte = null;
+
             int RawValue;
 
             /*************************   Code Coupled with Serialport class  *****************************/
@@ -45,19 +48,26 @@ namespace ST_Serial.code
                     if ((char)RawValue == ':')
                     {
                         RecordStart = true;
+
+                        SingleRecord.Add(0X7B);   /*< Add Start of Text */
                     }
 
                     else if (((char)RawValue == '\r') || ((char)RawValue == '\n'))
                     {
                         if (RecordStart)
                         {
-                            if (!code.serialport.SerialPort_WriteByteArray(SingleRecord.ToArray()))
-                            {
-                                MessageBox.Show("Something went wrong while streaming bytes!\nCheck Serial port", "Port Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            SingleRecord.Add(0X7D);  /*< Add End of Record. */
 
-                                /* End reading incase of error */
-                                EndReading = true;
+                            bool IsRecordSent = code.serialport.SerialPort_WriteByteArray(SingleRecord.ToArray());
+
+                            System.Threading.Thread.Sleep(50);
+
+                            if (!Check_Host_Response(code.serialport.SerialPort_ReadByte()))
+                            {
+                                bool Val = false;
                             }
+
+                            SingleRecord = new List<byte>();
                         }
 
                         RecordStart = false;
@@ -69,7 +79,15 @@ namespace ST_Serial.code
 
                         if (Byte.Length == 2)
                         {
-                            SingleRecord.Add(code.lib.ConvertStringToByte(Byte));
+                            byte Val = code.lib.ConvertStringToByte(Byte);
+
+                            if ((Val == 0x7B) || (Val == 0x7D) || (Val == 0x05))
+                            {
+                                /* Insert Escape character */
+                                SingleRecord.Add(0x05);
+                            }
+
+                            SingleRecord.Add(Val);
 
                             Byte = null;
                         }
@@ -92,6 +110,31 @@ namespace ST_Serial.code
 
             /* Reset current application using the serail port. */
             code.serialport.CurrentSerialAPP = (int)Application.APP_NONE;
+        }
+
+        private static bool Check_Host_Response(byte[] Data)
+        {
+            bool RetVal = true;
+            byte[] Response = new byte[] { 0X7B,0XA0,0X02,0X00,0X00,0X7D};
+
+            if (Data.Length == 6)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    if (Data[i] != Response[i])
+                    {
+                        RetVal = false;
+                        break;
+                    }
+                }
+            }
+
+            else
+            {
+                RetVal = false;
+            }
+
+            return RetVal;
         }
     }
 }

@@ -34,8 +34,9 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.button3 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,7 +45,7 @@
             this.flowLayoutPanel1.AutoScroll = true;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 48);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(707, 262);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(707, 241);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
             // button1
@@ -69,26 +70,36 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.richTextBox1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 316);
+            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 295);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(704, 177);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Receiver";
             // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(0, 19);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(698, 152);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            // 
             // timer1
             // 
+            this.timer1.Enabled = true;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(633, 478);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(77, 21);
+            this.button3.TabIndex = 4;
+            this.button3.Text = "clear";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(6, 19);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(692, 158);
+            this.textBox1.TabIndex = 0;
             // 
             // texter
             // 
@@ -96,6 +107,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(732, 505);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -105,6 +117,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "texter";
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -115,7 +128,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
