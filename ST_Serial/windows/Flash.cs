@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ST_Serial.windows
+namespace comm_tool.windows
 {
     public partial class Flash : Form
     {

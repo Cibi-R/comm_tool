@@ -1,4 +1,4 @@
-﻿namespace ST_Serial
+﻿namespace comm_tool
 {
     partial class mainwindow
     {

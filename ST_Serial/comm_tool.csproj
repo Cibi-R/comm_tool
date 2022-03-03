@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{821C6514-8037-48D0-99E5-7D00C90FA785}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ST_Serial</RootNamespace>
-    <AssemblyName>ST_Serial</AssemblyName>
+    <RootNamespace>comm_tool</RootNamespace>
+    <AssemblyName>comm_tool</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -111,6 +111,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="usercontrol\uc_texter.resx">
       <DependentUpon>uc_texter.cs</DependentUpon>

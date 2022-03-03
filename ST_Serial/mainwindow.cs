@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ST_Serial
+namespace comm_tool
 {
     public partial class mainwindow : Form
     {

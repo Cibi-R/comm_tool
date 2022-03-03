@@ -8,23 +8,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ST_Serial.windows
+namespace comm_tool.windows
 {
     public partial class texter : Form
     {
+        /*< to select the different color for richbox */
+        static int ColorSelect = 0;
+
         public texter()
         {
             InitializeComponent();
 
-            Init_TexterWindow_UI();
+            InitializeTexterWindow_UI();
         }
 
-        private void Init_TexterWindow_UI()
+        private void InitializeTexterWindow_UI()
         {
-            /* Initially add one control to the panel. */
-            usercontrol.uc_texter NewControl = new usercontrol.uc_texter(flowLayoutPanel1.Controls.Count.ToString());
-            flowLayoutPanel1.Controls.Add(NewControl);
+            /* Initially add one user control to the flow layout panel. */
+            usercontrol.uc_texter newUserControl = new usercontrol.uc_texter(flowLayoutPanel1.Controls.Count.ToString());
+            flowLayoutPanel1.Controls.Add(newUserControl);
             timer1.Start();
+
+            /*< make rich textbox1 font bold */
+            richTextBox1.Font = new Font(richTextBox1.Font, FontStyle.Bold);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -33,12 +39,12 @@ namespace ST_Serial.windows
             if (flowLayoutPanel1.Controls.Count < 10)
             {
                 /* To add user control at runtime. */
-                usercontrol.uc_texter NewControl = new usercontrol.uc_texter(flowLayoutPanel1.Controls.Count.ToString());
-                flowLayoutPanel1.Controls.Add(NewControl);
+                usercontrol.uc_texter newUserControl = new usercontrol.uc_texter(flowLayoutPanel1.Controls.Count.ToString());
+                flowLayoutPanel1.Controls.Add(newUserControl);
             }
             else
             {
-                MessageBox.Show("Maximum Limit Reached!","", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("transmitter window limit exceeded!!!","", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -49,12 +55,12 @@ namespace ST_Serial.windows
 
         private void button3_Click(object sender, EventArgs e)
         {
-            textBox1.Text = "";
+            richTextBox1.Text = null;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Update_Texter();
+            Update_Texter_ReceiveBox();
         }
 
         ~texter()
@@ -62,18 +68,42 @@ namespace ST_Serial.windows
           
         }
 
-        private void Update_Texter()
+        private void Update_Texter_ReceiveBox()
         {
             if (code.serialport.IsPortOpen())
             {
                 if (code.serialport.SerialPort_AvailBytes() > 0)
                 {
-                    string Val = "";
+                    string val = "";
+
                     foreach (byte Data in code.serialport.SerialPort_ReadByte())
                     {
-                        Val += (Data.ToString() + " "); 
+                        val += (Data.ToString() + "-");
                     }
-                    MessageBox.Show(Val);
+
+                    switch (ColorSelect)
+                    {
+                        case 0: 
+                            richTextBox1.SelectionBackColor = Color.Green; break;
+                        case 1:
+                            richTextBox1.SelectionBackColor = Color.Red; break;
+                        case 2:
+                            richTextBox1.SelectionBackColor = Color.Blue; break;
+                        case 4:
+                            richTextBox1.SelectionBackColor = Color.Black; break;
+                        case 5:
+                            richTextBox1.SelectionBackColor = Color.Magenta; break;
+                        default:
+                        {
+                            richTextBox1.SelectionBackColor = Color.Magenta;
+                                ColorSelect = -1;
+                            break;
+                        }
+                    }
+                    ColorSelect++; /*< increment to select the next color */
+
+                    richTextBox1.SelectionColor = Color.White;
+                    richTextBox1.SelectedText += val;
                 }
             }
         }

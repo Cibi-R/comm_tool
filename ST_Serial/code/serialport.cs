@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ST_Serial.code
+namespace comm_tool.code
 {
     public enum Application
     {
@@ -130,7 +130,7 @@ namespace ST_Serial.code
 
                     MySerialPort.Read(ReceivedBytes, 0, ByteCount);
 
-                    MySerialPort.DiscardInBuffer();
+                    // MySerialPort.DiscardInBuffer();
 
                     return ReceivedBytes;
                 }

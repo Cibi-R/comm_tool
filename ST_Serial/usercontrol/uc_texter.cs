@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ST_Serial.usercontrol
+namespace comm_tool.usercontrol
 {
     public partial class uc_texter : UserControl
     {
@@ -19,10 +19,10 @@ namespace ST_Serial.usercontrol
         {
             InitializeComponent();
 
-            Init_TexterUserControl(GroupboxNo);
+            Initialize_TexterUserControl(GroupboxNo);
         }
 
-        void Init_TexterUserControl(string GroupboxNo)
+        void Initialize_TexterUserControl(string GroupboxNo)
         {
             /* Disable Set time button. */
             button2.Enabled = false;
@@ -64,12 +64,12 @@ namespace ST_Serial.usercontrol
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            else if ((!checkBox1.Checked) && (button1.Text == "send"))
+            else if (button1.Text == "send")
             {
                 Text_Data(richTextBox1.Text);
             }
 
-            else if (checkBox1.Checked)
+            else
             {
                 if (button1.Text == "start")
                 {
@@ -81,7 +81,7 @@ namespace ST_Serial.usercontrol
                     }
                     else
                     {
-                        MessageBox.Show("Interval has not been set","Texting Information",
+                        MessageBox.Show("invalid periodicity value", "Texting Information",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
@@ -95,11 +95,6 @@ namespace ST_Serial.usercontrol
                         button1.Text = "start";
                     }
                 }
-            }
-
-            else
-            {
-                /* Do Nothing */
             }
         }
 
@@ -171,17 +166,17 @@ namespace ST_Serial.usercontrol
 
         private void Text_Data(string StringData)
         {
-            List<byte> ConvertedData = new List<byte>();
+            List<byte> txData = new List<byte>();
 
-            ConvertedData = code.lib.ConvertStringAToByteA(StringData.Split('-'));
+            txData = code.lib.ConvertStringAToByteA(StringData.Split('-'));
 
-            if (ConvertedData.Count == 0)
+            if (txData.Count == 0)
             {
-                label1.Text = "Value Empty";
+                label1.Text = "no data";
                 label1.ForeColor = System.Drawing.Color.Blue;
             }
             /* Send data serially */
-            else if (code.serialport.SerialPort_WriteByteArray(ConvertedData.ToArray()))
+            else if (code.serialport.SerialPort_WriteByteArray(txData.ToArray()))
             {
                 label1.Text = "sent";
                 label1.ForeColor = System.Drawing.Color.Green;
@@ -196,49 +191,7 @@ namespace ST_Serial.usercontrol
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-                                                         // APP.NONE
-            while ((!(code.serialport.CurrentSerialAPP == (int)0)) && (!BreakTimer))
-            {
-                if (!timer2.Enabled)
-                {
-                    timer2.Enabled = true;
-                    timer2.Start();
-                }
-                else { /* Do Nothing */ }
-
-                if (timer1.Enabled)
-                {
-                    timer1.Stop();
-                    timer1.Enabled = false;
-                }
-                else { /* Do Nothing */ }
-            }
-
-            timer1.Enabled = true;
-            timer1.Start();
-
-            timer2.Stop();
-            timer2.Enabled = false;
-
-            if (!BreakTimer)
-            {
-                /* Set the serial port resource to texter  */
-                code.serialport.CurrentSerialAPP = (int)3;
-
-                Text_Data(richTextBox1.Text);
-
-                /* release the serial port resource from texter */
-                code.serialport.CurrentSerialAPP = (int)0;
-            }
-            else
-            {
-                BreakTimer = false;
-            }
-        }
-
-        private void timer2_Tick(object sender, EventArgs e)
-        {
-            BreakTimer = true;
+            Text_Data(richTextBox1.Text);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ST_Serial.code
+namespace comm_tool.code
 {
     class files
     {

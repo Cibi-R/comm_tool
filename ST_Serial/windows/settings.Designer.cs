@@ -1,4 +1,4 @@
-﻿namespace ST_Serial.windows
+﻿namespace comm_tool.windows
 {
     partial class settings
     {
