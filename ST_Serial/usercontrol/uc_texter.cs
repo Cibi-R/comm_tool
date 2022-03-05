@@ -16,6 +16,8 @@ namespace comm_tool.usercontrol
         int KeyCount = -1;
         bool PlaceHifen = false;
 
+        Stack<char> TextChar = new Stack<char>();
+
         private static Mutex serialPortMutex = new Mutex();
 
         public uc_texter(string GroupboxNo)
@@ -131,40 +133,51 @@ namespace comm_tool.usercontrol
         {
             char pressedChar = e.KeyChar;
 
+            /**
+             * Having empty text box and non empty TextChar stack on keypress event will result in undesired printing of hifen
+             **/
+            if (string.IsNullOrEmpty(richTextBox1.Text) && (TextChar.Count > 0))
+            {
+                TextChar.Clear();
+            }
+            else
+            {
+                /*< Do nothing */
+            }
+
             if (!("0123456789ABCDEFabcdef\b".Contains(pressedChar)))
             {
                 e.Handled = true;
             }
 
-            else
+            else if (('\b' == pressedChar) && (!string.IsNullOrEmpty(richTextBox1.Text)))
             {
-                /* Behaviour of textbox while pressing backspace to be implemented. */
-                if (pressedChar == '\b')
+              if (1 == TextChar.Count)
                 {
+                    TextChar.Push('r');
+                    TextChar.Push('r');
 
+                    System.Windows.Forms.SendKeys.Send("\b");
                 }
-
                 else
                 {
-                    KeyCount++;
-
-                    if (PlaceHifen)
-                    {
-                        PlaceHifen = false;
-
-                        richTextBox1.Text += "-";
-
-                        /* Placing the cursor at the last position. */
-                        richTextBox1.Focus();
-                        richTextBox1.SelectionStart = richTextBox1.Text.Length;
-                    }
-
-                    if (KeyCount == 1)
-                    {
-                        KeyCount = -1;
-                        PlaceHifen = true;
-                    }
+                    TextChar.Pop();
                 }
+            }
+            else
+            {
+                if (2 == TextChar.Count)
+                {
+                    richTextBox1.Text += "-";
+
+                    TextChar.Clear();
+                }
+
+                TextChar.Push(pressedChar);
+
+                /* Placing the cursor at the last position. */
+                richTextBox1.Focus();
+                richTextBox1.SelectionStart = richTextBox1.Text.Length;
             }
         }
 
