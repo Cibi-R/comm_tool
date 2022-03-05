@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace comm_tool.usercontrol
 {
@@ -14,7 +15,9 @@ namespace comm_tool.usercontrol
     {
         int KeyCount = -1;
         bool PlaceHifen = false;
-        bool BreakTimer = false;
+
+        private static Mutex serialPortMutex = new Mutex();
+
         public uc_texter(string GroupboxNo)
         {
             InitializeComponent();
@@ -60,16 +63,11 @@ namespace comm_tool.usercontrol
             /* send/start button */
             if (!(code.serialport.IsPortOpen() && code.serialport.SerialPort_IsConfigured()))
             {
-                MessageBox.Show("Port not cofigured or opened!", "Texting Information",
+                MessageBox.Show("please configure and open the port!", "Texting Information",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            else if (button1.Text == "send")
-            {
-                Text_Data(richTextBox1.Text);
-            }
-
-            else
+            else if (!string.IsNullOrEmpty(richTextBox1.Text))
             {
                 if (button1.Text == "start")
                 {
@@ -88,32 +86,38 @@ namespace comm_tool.usercontrol
 
                 else if (button1.Text == "stop")
                 {
-                    if (timer1.Interval > 0)
-                    {
-                        timer1.Stop();
+                    timer1.Stop();
 
-                        button1.Text = "start";
-                    }
+                    button1.Text = "start";
                 }
+
+                else
+                {
+                    // button - send
+                    Text_Data(richTextBox1.Text);
+                }
+            }
+
+            else
+            {
+                label1.Text = "no data";
+                label1.ForeColor = System.Drawing.Color.Blue;
             }
         }
 
         private void button2_Click_1(object sender, EventArgs e)
         {
-            /* SetTime button */
-            
+            /**
+             * If the set time button is pressed when texter is already sending serial data, it is prompted to stop the onging
+             * communication before setting the new periocity value.
+             **/
             if(button1.Text == "start")
             {
-                windows.timing NewTimingWindow = new windows.timing(timer1.Interval);
+                windows.timing newTimingWindow = new windows.timing(timer1.Interval);
 
-                if (NewTimingWindow.ShowDialog() == DialogResult.OK)
+                if (newTimingWindow.ShowDialog() == DialogResult.OK)
                 {
-                    timer1.Interval = NewTimingWindow.Timer_Interval;
-                }
-                else
-                {
-                    MessageBox.Show("Previous value retained for timer!", "Texting Information", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    timer1.Interval = newTimingWindow.Timer_Interval;
                 }
             }
             else
@@ -125,9 +129,9 @@ namespace comm_tool.usercontrol
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            char PressedChar = e.KeyChar;
+            char pressedChar = e.KeyChar;
 
-            if (!("0123456789ABCDEFabcdef\b".Contains(PressedChar)))
+            if (!("0123456789ABCDEFabcdef\b".Contains(pressedChar)))
             {
                 e.Handled = true;
             }
@@ -135,7 +139,7 @@ namespace comm_tool.usercontrol
             else
             {
                 /* Behaviour of textbox while pressing backspace to be implemented. */
-                if (PressedChar == '\b')
+                if (pressedChar == '\b')
                 {
 
                 }
@@ -170,13 +174,8 @@ namespace comm_tool.usercontrol
 
             txData = code.lib.ConvertStringAToByteA(StringData.Split('-'));
 
-            if (txData.Count == 0)
-            {
-                label1.Text = "no data";
-                label1.ForeColor = System.Drawing.Color.Blue;
-            }
             /* Send data serially */
-            else if (code.serialport.SerialPort_WriteByteArray(txData.ToArray()))
+            if (code.serialport.SerialPort_WriteByteArray(txData.ToArray()))
             {
                 label1.Text = "sent";
                 label1.ForeColor = System.Drawing.Color.Green;
@@ -191,7 +190,14 @@ namespace comm_tool.usercontrol
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Text_Data(richTextBox1.Text);
+            timer1.Stop();
+
+            if (serialPortMutex.WaitOne(100))
+            {
+                Text_Data(richTextBox1.Text);
+            }
+
+            timer1.Start();
         }
     }
 }
