@@ -13,9 +13,6 @@ namespace comm_tool.usercontrol
 {
     public partial class uc_texter : UserControl
     {
-        int KeyCount = -1;
-        bool PlaceHifen = false;
-
         Stack<char> TextChar = new Stack<char>();
 
         private static Mutex serialPortMutex = new Mutex();
