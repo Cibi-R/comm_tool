@@ -13,22 +13,53 @@ namespace comm_tool.windows
 {
     public partial class Flash : Form
     {
+        /*< collection of hex records are stored in this queue */
+        private List<List<byte>> HexFileList = new List<List<byte>>();
+
         public Flash()
         {
             InitializeComponent();
 
-            Init_FlashWindow_UI();
+            InitializeFlashWindow_UI();
         }
 
-        private void Init_FlashWindow_UI()
+        private void InitializeFlashWindow_UI()
         {
-            label1.Text = "";
-
             /* openFile dialogue initialization:
              * 
              * Set Defualt Extension(DefaultExt) to hex
              */
             openFileDialog1.DefaultExt = "hex";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            /* Write button */
+            if (!string.IsNullOrEmpty(openFileDialog1.FileName))
+            {
+                try
+                {
+                    FileStream newFileStream = new FileStream(openFileDialog1.FileName, FileMode.Open);
+                    HexFileList = code.files.Parse_HexStream(newFileStream);
+                    newFileStream.Dispose();
+                    Flash_Programming();
+                }
+                catch
+                {
+                    richTextBox1.Text += "> invalid path or file" + Environment.NewLine;
+                }
+            }
+
+            else
+            {
+                richTextBox1.Text += "> file not selected" + Environment.NewLine;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            /* Cancel button */
+            this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -40,33 +71,18 @@ namespace comm_tool.windows
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Flash_Programming()
         {
-            /* Write button */
-            if (openFileDialog1.FileName != "")
+            if (0 != HexFileList.Count)
             {
-                try
+                foreach(List<byte> record in HexFileList)
                 {
-                    FileStream NewStream = new FileStream(openFileDialog1.FileName, FileMode.Open);
-                    code.files.Parse_HexStream(NewStream);
-                    NewStream.Dispose();
-                }
-                catch
-                {
-                    MessageBox.Show("Something went wrong while accessing file\nInvalid path or file","File Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    if (!code.serialport.SerialPort_WriteByteArray(record.ToArray()))
+                    {
+                        richTextBox1.Text += "> hex record send failed" + Environment.NewLine;
+                    }
                 }
             }
-
-            else
-            {
-                MessageBox.Show("File not selected!", "Flash Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            /* Cancel button */
-            this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
         }
     }
 }

@@ -10,106 +10,125 @@ namespace comm_tool.code
 {
     class files
     {
-        public static void Parse_HexStream(FileStream NewStream)
+        const byte STX = 0XFD;
+        const byte ETX = 0XFE;
+        const byte DTX = 0XFF;
+
+        public static List<List<byte>> Parse_HexStream(FileStream newFileStream)
         {
-            /* To store a single record while sending records to the MCU */
-            List<byte> SingleRecord = new List<byte>();
+            /*< to store a single record */
+            List<byte> hexRecord = new List<byte>();
 
-            BinaryReader NewBReader = new BinaryReader(NewStream);
+            /*< to the entire hex file (collection of hex records) */
+            List<List<byte>> hexRecordList = new List<List<byte>>();
 
-            bool RecordStart = false, EndReading = false;
+            BinaryReader newBinaryReader = new BinaryReader(newFileStream);
 
-            string Byte = null;
+            bool recordStart = false;
+            bool endReading = false;
 
-            int RawValue;
+            string stringByte = null;
 
-            /*************************   Code Coupled with Serialport class  *****************************/
-
-            if (code.serialport.CurrentSerialAPP == (int)Application.APP_NONE)
-            {
-                code.serialport.CurrentSerialAPP = (int)Application.APP_FLASH;
-            }
-
-            else
-            {
-                MessageBox.Show("Cannot use Serial port righ now!,[" + code.serialport.CurrentSerialAPP.ToString() +
-                    "] using the serial port", "Serial Port Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                /* Return incase if other applications using the serial port */
-                return;
-            }
-
-            /*********************************************************************************************/
+            char rawValue;
 
             try
             {
-                while (((RawValue = NewBReader.ReadChar()) != -1) && !EndReading)
+                while ((newBinaryReader.PeekChar() != -1) && !endReading)
                 {
-                    if ((char)RawValue == ':')
-                    {
-                        RecordStart = true;
+                    rawValue = newBinaryReader.ReadChar();
 
-                        SingleRecord.Add(0X7B);   /*< Add Start of Text */
+                    if (rawValue == ':')
+                    {
+                        recordStart = true;
+
+                        /*< insert start of the packet */
+                        hexRecord.Add(STX);
                     }
 
-                    else if (((char)RawValue == '\r') || ((char)RawValue == '\n'))
+                    else if (((char)rawValue == '\r') || ((char)rawValue == '\n'))
                     {
-                        if (RecordStart)
+                        if (recordStart)
                         {
-                            SingleRecord.Add(0X7D);  /*< Add End of Record. */
+                            /*< insert end of the packet */
+                            hexRecord.Add(ETX);
 
-                            bool IsRecordSent = code.serialport.SerialPort_WriteByteArray(SingleRecord.ToArray());
+                            hexRecordList.Add(hexRecord);
 
-                            System.Threading.Thread.Sleep(50);
+                            hexRecord = new List<byte>();
 
-                            if (!Check_Host_Response(code.serialport.SerialPort_ReadByte()))
-                            {
-                                bool Val = false;
-                            }
-
-                            SingleRecord = new List<byte>();
+                            recordStart = false;
                         }
-
-                        RecordStart = false;
                     }
 
-                    else if (RecordStart)
+                    else if (recordStart)
                     {
-                        Byte += ((char)RawValue).ToString();
+                        stringByte += rawValue.ToString();
 
-                        if (Byte.Length == 2)
+                        if (2 == stringByte.Length)
                         {
-                            byte Val = code.lib.ConvertStringToByte(Byte);
+                            byte acculatedByte = code.lib.ConvertStringToByte(stringByte);
 
-                            if ((Val == 0x7B) || (Val == 0x7D) || (Val == 0x05))
+                            if ((STX == acculatedByte) || (ETX == acculatedByte) || (DTX == acculatedByte))
                             {
                                 /* Insert Escape character */
-                                SingleRecord.Add(0x05);
+                                hexRecord.Add(DTX);
                             }
 
-                            SingleRecord.Add(Val);
+                            hexRecord.Add(acculatedByte);
 
-                            Byte = null;
+                            stringByte = null;
                         }
                     }
 
                     else
                     {
-                        MessageBox.Show("Logical error!");
+                        /*< byte allignment in the file is not proper */
+                        MessageBox.Show("invalid file!");
 
-                        /* End reading incase of error */
-                        EndReading = true;
+                        endReading = true;
                     }
                 }
             }
 
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Something went wrong while parsing Hex!","Parse Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show(ex.ToString());
             }
 
-            /* Reset current application using the serail port. */
-            code.serialport.CurrentSerialAPP = (int)Application.APP_NONE;
+            newBinaryReader.Dispose();
+
+            hexRecordList.Insert(0, HexRecord_AddSize(hexRecordList.Count));
+
+            return hexRecordList;
+        }
+
+        private static List<byte> HexRecord_AddSize(int count)
+        {
+            List<byte> sizeFrame = new List<byte>();
+
+            byte b1 = (byte)(count & 0XFF);
+            byte b2 = (byte)((count >> 8) & 0XFF);
+
+            /*< start of frame */
+            sizeFrame.Add(STX);
+
+            /*< data bytes */
+            if ((b1 == STX) || (b1 == ETX) | (b1 == DTX))
+            {
+                sizeFrame.Add(DTX);
+            }
+            sizeFrame.Add(b1);
+
+            if ((b2 == STX) || (b2 == ETX) | (b2 == DTX))
+            {
+                sizeFrame.Add(DTX);
+            }
+            sizeFrame.Add(b2);
+
+            /*< end of frame */
+            sizeFrame.Add(ETX);
+
+            return sizeFrame;
         }
 
         private static bool Check_Host_Response(byte[] Data)
