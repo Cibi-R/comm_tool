@@ -75,15 +75,76 @@ namespace comm_tool.windows
         {
             if (0 != HexFileList.Count)
             {
-                foreach(List<byte> record in HexFileList)
+                if (checkBox1.Checked)
                 {
-                    if (!code.serialport.SerialPort_WriteByteArray(record.ToArray()))
+                    /*< if jump to application check box is checked, add a frame at the end */
+                    List<byte> frame = new List<byte>()
                     {
-                        richTextBox1.Text += "> hex record send failed" + Environment.NewLine;
-                    }
+                        0XFD, 0X06, 0XFA, 0XFE
+                    };
 
-                    System.Threading.Thread.Sleep(100);
+                    HexFileList.Add(frame);
                 }
+
+                richTextBox1.Text += "> flashing started..." + Environment.NewLine;
+
+                backgroundWorker1.RunWorkerAsync();
+            }
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            bool response_received = false;
+
+            foreach (List<byte> record in HexFileList)
+            {
+                response_received = false;
+
+                if (!code.serialport.SerialPort_WriteByteArray(record.ToArray()))
+                {
+                    /*< transmitting frame failed */
+                    break;
+                }
+                else
+                {
+                    uint timeout = 0XFFFF;
+
+                    while ((0 != timeout) && (!response_received))
+                    {
+                        if (3 < code.serialport.SerialPort_AvailBytes())
+                        {
+                            if (code.serialport.SerialPort_ReadByte()[1] == 0X01)
+                            {
+                                response_received = true;
+                            }
+                            else
+                            {
+                                timeout = 0;
+                            }
+                        }
+
+                        timeout--;
+                    }
+                }
+
+                if (!response_received)
+                { 
+                    e.Cancel = true;
+
+                    break;
+                }
+            }
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                richTextBox1.Text += "> reflashing failed due to nack/no response" + Environment.NewLine;
+            }
+            else
+            {
+                richTextBox1.Text += "> reflashing succefully completed..." + Environment.NewLine;
             }
         }
     }

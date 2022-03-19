@@ -175,5 +175,10 @@ namespace comm_tool.code
         {
             return MySerialPort.BytesToRead;
         }
+
+        public static void SerialPort_Flash()
+        {
+            MySerialPort.DiscardInBuffer();
+        }
     }
 }

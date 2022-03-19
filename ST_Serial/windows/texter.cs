@@ -31,6 +31,9 @@ namespace comm_tool.windows
 
             /*< make rich textbox1 font bold */
             richTextBox1.Font = new Font(richTextBox1.Font, FontStyle.Bold);
+
+            /*< flash out the serial port, to avoid displaying data's from the other windows */
+            code.serialport.SerialPort_Flash();
         }
 
         private void button1_Click(object sender, EventArgs e)
