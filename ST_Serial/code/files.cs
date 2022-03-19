@@ -10,9 +10,14 @@ namespace comm_tool.code
 {
     class files
     {
+        /*< message control characters */
         const byte STX = 0XFD;
         const byte ETX = 0XFE;
         const byte DTX = 0XFF;
+
+        /*< message IDs */
+        const byte ID_REFLASH_INFO = 0X04;
+        const byte ID_REPROGRAMMING = 0X05;
 
         public static List<List<byte>> Parse_HexStream(FileStream newFileStream)
         {
@@ -40,19 +45,14 @@ namespace comm_tool.code
                     if (rawValue == ':')
                     {
                         recordStart = true;
-
-                        /*< insert start of the packet */
-                        hexRecord.Add(STX);
                     }
 
                     else if (((char)rawValue == '\r') || ((char)rawValue == '\n'))
                     {
                         if (recordStart)
                         {
-                            /*< insert end of the packet */
-                            hexRecord.Add(ETX);
-
-                            hexRecordList.Add(hexRecord);
+                            /*< a complete record has been accumlated, make the record as a transmitable messsage frame */
+                            hexRecordList.Add(HexRecord_MakeFrame(hexRecord));
 
                             hexRecord = new List<byte>();
 
@@ -67,12 +67,6 @@ namespace comm_tool.code
                         if (2 == stringByte.Length)
                         {
                             byte acculatedByte = code.lib.ConvertStringToByte(stringByte);
-
-                            if ((STX == acculatedByte) || (ETX == acculatedByte) || (DTX == acculatedByte))
-                            {
-                                /* Insert Escape character */
-                                hexRecord.Add(DTX);
-                            }
 
                             hexRecord.Add(acculatedByte);
 
@@ -102,30 +96,65 @@ namespace comm_tool.code
             return hexRecordList;
         }
 
+        private static List<byte> HexRecord_MakeFrame(List<byte> record)
+        {
+            byte checksum;
+
+            /*< checksum should be calculated with id value */
+            record.Insert(0, ID_REPROGRAMMING);
+
+            /*< calculate checksum of the record */
+            checksum = code.lib.Calculate_8bit_Checksum(record);
+
+            /*< add checksum value, a complete frame has been framed. */
+            record.Add(checksum);
+
+            for (int i = 0; i < record.Count; i++)
+            {
+                if ((record[i] == STX) || (record[i] == ETX) || (record[i] == DTX))
+                {
+                    record.Insert(i, DTX);
+
+                    /*< move the index to next position, as the index value will be increased while inserting an element */
+                    i++;
+                }
+            }
+
+            /*< add start and end of frame */
+            record.Insert(0, STX);
+            record.Add(ETX);
+
+            return record;
+        }
+
         private static List<byte> HexRecord_AddSize(int count)
         {
             List<byte> sizeFrame = new List<byte>();
 
-            byte b1 = (byte)(count & 0XFF);
-            byte b2 = (byte)((count >> 8) & 0XFF);
+            /*< add message id */
+            sizeFrame.Add(ID_REFLASH_INFO);
 
-            /*< start of frame */
-            sizeFrame.Add(STX);
+            /*< add data bytes */
+            sizeFrame.Add((byte)(count & 0XFF));
+            sizeFrame.Add((byte)((count >> 8) & 0XFF));
 
-            /*< data bytes */
-            if ((b1 == STX) || (b1 == ETX) | (b1 == DTX))
+            /*< add checksum */
+            sizeFrame.Add(code.lib.Calculate_8bit_Checksum(sizeFrame));
+
+            /*< add control characters */
+            for (int i = 0; i < sizeFrame.Count; i++)
             {
-                sizeFrame.Add(DTX);
-            }
-            sizeFrame.Add(b1);
+                if ((sizeFrame[i] == STX) || (sizeFrame[i] == ETX) || (sizeFrame[i] == DTX))
+                {
+                    sizeFrame.Insert(i, DTX);
 
-            if ((b2 == STX) || (b2 == ETX) | (b2 == DTX))
-            {
-                sizeFrame.Add(DTX);
+                    /*< move the index to next position, because the list count will be increased while inserting an element */
+                    i++;
+                }
             }
-            sizeFrame.Add(b2);
 
-            /*< end of frame */
+            /*< add start and end of frame */
+            sizeFrame.Insert(0, STX);
             sizeFrame.Add(ETX);
 
             return sizeFrame;

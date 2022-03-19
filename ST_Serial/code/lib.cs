@@ -52,5 +52,21 @@ namespace comm_tool.code
 
             return (byte)(ConvertedData & (0xFF));
         }
+
+        public static byte Calculate_8bit_Checksum(List<byte> frame)
+        {
+            uint checksum = 0;
+
+            foreach (byte b in frame)
+            {
+                checksum += b;
+            }
+
+            checksum = ~checksum ;
+
+            checksum += 1;
+
+            return (byte)(checksum & 0XFF);
+        }
     }
 }

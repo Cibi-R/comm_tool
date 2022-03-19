@@ -81,6 +81,8 @@ namespace comm_tool.windows
                     {
                         richTextBox1.Text += "> hex record send failed" + Environment.NewLine;
                     }
+
+                    System.Threading.Thread.Sleep(100);
                 }
             }
         }
